@@ -8,6 +8,7 @@ dependencies = [
     "pycryptodome<4.0.0,>=3.21.0",
     "requests<3.0.0,>=2.32.3",
     "tqdm>=4.66.5",
+    "typer>=0.12.5",
     "unitypy<2.0.0,>=1.20.4",
 ]
 
