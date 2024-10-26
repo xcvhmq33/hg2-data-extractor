@@ -1,0 +1,76 @@
+[project]
+name = "hg2-data-extractor"
+description = "Python package for extracting Houkai Gakuen 2 assets data"
+readme = "README.md"
+requires-python = ">=3.12,<4.0"
+dynamic = ["version"]
+dependencies = [
+    "pycryptodome<4.0.0,>=3.21.0",
+    "requests<3.0.0,>=2.32.3",
+    "tqdm>=4.66.5",
+    "unitypy<2.0.0,>=1.20.4",
+]
+
+[project.scripts]
+hg2-data-extractor = "hg2_data_extractor.__main__:main"
+
+[tool.uv]
+dev-dependencies = [
+    "mypy<2.0.0,>=1.12.0",
+    "pre-commit<5.0.0,>=4.0.1",
+    "ruff<1.0.0,>=0.6.9",
+    "types-passlib<2.0.0,>=1.7.7.20240819",
+]
+
+[build-system]
+requires = ["hatchling"]
+build-backend = "hatchling.build"
+
+[tool.mypy]
+strict = true
+ignore_missing_imports = true
+exclude = [".venv"]
+
+[tool.ruff]
+target-version = "py312"
+
+[tool.ruff.lint]
+select = [
+    "E",  # pycodestyle errors
+    "W",  # pycodestyle warnings
+    "F",  # pyflakes
+    "I",  # isort
+    "N", # pep8-naming
+    "UP",  # pyupgrade
+    "TRY", # tryceratops
+    "B",  # flake8-bugbear
+    "C4",  # flake8-comprehensions
+    "EM", # flake8-errmsg
+    "FA", # flake8-future-annotations
+    "PT", # flake8-pytest-style
+    "T20", # flake8-print
+    "ICN", # flake8-import-conventions
+    "PIE", # flake8-pie
+    "ANN", # flake8-annotations
+    "SIM", # flake8-simplify
+    "TID", # flake8-tidy-imports
+    "ARG", # flake8-unused-arguments
+    "PTH", # flake8-use-pathlib
+    "ERA001", # commented-out-code
+    "RUF001", # ambiguous-unicode-character-string
+    "RUF003", # ambiguous-unicode-character-comment
+]
+ignore = [
+    "ANN101", # missing-type-self
+    "ANN102", # missing-type-cls
+    "ANN204", # missing-return-type-special-method (dunder methods)
+]
+
+[tool.ruff.format]
+quote-style = "double"
+indent-style = "space"
+skip-magic-trailing-comma = false
+line-ending = "auto"
+
+[tool.hatch.version]
+path = "src/hg2_data_extractor/__init__.py"
