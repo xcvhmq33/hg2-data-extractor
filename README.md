@@ -32,11 +32,14 @@ To extract text assets data from data_all_decrypted use:
 hg2-data-extractor extract --asset-names asset_name1,asset_name2,...
 ```
 By default, `WeaponDataV3`, `CostumeDataV2`, `PassiveSkillDataV3`, `SpecialAttributeDataV2`, `PetData`, `PetSkillData` assets will be extracted to `./extracted/`  
-To show all valid asset names, use (data_all_decrypted is required):
+
+### List
+To check all valid asset names, use (data_all_decrypted is required):
 
 ```shell
 hg2-data-extractor lst
 ```
+By default, extracts to `./extracted/asset_names.txt`
 
 # Credits
 This project is a copied and modified version of [hg2-downloader](https://dev.s-ul.net/BLUEALiCE/hg2-downloader) project authored by [BLUEALiCE](https://dev.s-ul.net/BLUEALiCE)

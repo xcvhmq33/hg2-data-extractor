@@ -19,12 +19,11 @@ def ask_for_rewrite_if_exists(file_path: str) -> bool:
     return rewrite
 
 
-@app.command(help="Prints all asset names in data_all_decrypted.unity3d to stdout")
-def lst(data_all_dir_path: str = "data_all") -> None:
+@app.command(help="Extracts all asset names from data_all_decrypted.unity3d")
+def lst(data_all_dir_path: str = "data_all", output_file_path: str = "extracted/asset_names.txt") -> None:
     data_extractor = DataExtractor(f"{data_all_dir_path}/data_all_decrypted.unity3d")
-    names = data_extractor.get_asset_names()
-    for name in names:
-        typer.echo(name)
+    if ask_for_rewrite_if_exists(output_file_path):
+            data_extractor.extract_asset_names(output_file_path)
 
 
 @app.command(help="Downloads data_all.unity3d from server")

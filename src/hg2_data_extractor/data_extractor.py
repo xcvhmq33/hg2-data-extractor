@@ -25,6 +25,13 @@ class DataExtractor:
                 with output_file_path.open("wb") as output_file:
                     output_file.write(asset.m_Script.encode("utf-8", "surrogateescape"))
 
+    def extract_asset_names(self, output_file_path: str) -> None:
+        output_dir_path = Path(output_file_path).parent
+        output_dir_path.mkdir(parents=True, exist_ok=True)
+        asset_names = self.get_asset_names()
+        with Path(output_file_path).open("w+") as output_file:
+            output_file.write('\n'.join(asset_names))
+
     def get_asset_names(self) -> list[str]:
         return [
             Path(asset_path).stem
