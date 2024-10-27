@@ -30,13 +30,10 @@ class DataExtractor:
         output_dir_path.mkdir(parents=True, exist_ok=True)
         asset_names = self.get_asset_names()
         with Path(output_file_path).open("w+") as output_file:
-            output_file.write('\n'.join(asset_names))
+            output_file.write("\n".join(asset_names))
 
     def get_asset_names(self) -> list[str]:
-        return [
-            Path(asset_path).stem
-            for asset_path in self.data_all_bundle.container
-        ]
+        return [Path(asset_path).stem for asset_path in self.data_all_bundle.container]
 
     def _validate_file_exists(self, file_path: str) -> None:
         if not Path(file_path).is_file():

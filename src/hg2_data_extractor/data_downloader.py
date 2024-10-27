@@ -37,13 +37,13 @@ class DataDownloader:
         data_all_name = self._parse_data_all_name(data_json)
         data_all_url = f"{self.data_url}/AssetBundles/{data_all_name}"
 
-        progressbar = TqdmUpTo(
+        with TqdmUpTo(
             unit="B", unit_scale=True, unit_divisor=1024, miniters=1, desc="data_all"
-        )
-        urllib.request.urlretrieve(
-            data_all_url, output_file_path, reporthook=progressbar.update_to
-        )
-        progressbar.total = progressbar.n
+        ) as progressbar:
+            urllib.request.urlretrieve(
+                data_all_url, output_file_path, reporthook=progressbar.update_to
+            )
+            progressbar.total = progressbar.n
 
     def _get_data_url(self) -> str:
         data_urls = {
