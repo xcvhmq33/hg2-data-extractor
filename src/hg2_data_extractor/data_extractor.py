@@ -35,7 +35,7 @@ class DataExtractor:
     def get_asset_names(self) -> list[str]:
         return [
             Path(asset_path).stem
-            for asset_path in self.data_all_bundle.container.keys()
+            for asset_path in self.data_all_bundle.container
         ]
 
     def _validate_file_exists(self, file_path: str) -> None:
