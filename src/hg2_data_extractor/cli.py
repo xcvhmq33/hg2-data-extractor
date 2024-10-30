@@ -1,4 +1,5 @@
 from pathlib import Path
+from typing import Annotated
 
 import typer
 
@@ -21,8 +22,8 @@ def ask_for_rewrite_if_exists(file_path: str) -> bool:
 
 @app.command(help="Extracts all asset names from data_all_decrypted.unity3d")
 def lst(
-    data_all_dir_path: str = "data_all",
-    output_file_path: str = "extracted/asset_names.txt",
+    output_file_path: Annotated[str, typer.Argument()] = "extracted/asset_names.txt",
+    data_all_dir_path: Annotated[str, typer.Argument()] = "data_all",
 ) -> None:
     data_extractor = DataExtractor(f"{data_all_dir_path}/data_all_decrypted.unity3d")
     if ask_for_rewrite_if_exists(output_file_path):
@@ -30,7 +31,11 @@ def lst(
 
 
 @app.command(help="Downloads data_all.unity3d from server")
-def download(server: str, version: str, output_dir_path: str = "data_all") -> None:
+def download(
+    server: str,
+    version: str,
+    output_dir_path: Annotated[str, typer.Argument()] = "data_all",
+) -> None:
     data_downloader = DataDownloader(server, version)
     if ask_for_rewrite_if_exists(f"{output_dir_path}/data_all_encrypted.unity3d"):
         data_downloader.download_data_all(output_dir_path)
@@ -38,8 +43,12 @@ def download(server: str, version: str, output_dir_path: str = "data_all") -> No
 
 @app.command(help="Decrypts data_all.unity3d")
 def decrypt(
-    input_file_path: str = "data_all/data_all_encrypted.unity3d",
-    output_file_path: str = "data_all/data_all_decrypted.unity3d",
+    input_file_path: Annotated[
+        str, typer.Argument()
+    ] = "data_all/data_all_encrypted.unity3d",
+    output_file_path: Annotated[
+        str, typer.Argument()
+    ] = "data_all/data_all_decrypted.unity3d",
 ) -> None:
     if ask_for_rewrite_if_exists(output_file_path):
         DataCipher.decrypt_file(input_file_path, output_file_path)
@@ -47,9 +56,13 @@ def decrypt(
 
 @app.command(help="Extracts text assets data from data_all_decrypted.unity3d")
 def extract(
-    data_all_decrypted_file_path: str = "data_all/data_all_decrypted.unity3d",
-    output_dir_path: str = "extracted",
-    asset_names: str = "WeaponDataV3,CostumeDataV2,PassiveSkillDataV3,SpecialAttributeDataV2,PetData,PetSkillData",
+    asset_names: Annotated[
+        str, typer.Argument()
+    ] = "WeaponDataV3,CostumeDataV2,PassiveSkillDataV3,SpecialAttributeDataV2,PetData,PetSkillData",
+    output_dir_path: Annotated[str, typer.Argument()] = "extracted",
+    data_all_decrypted_file_path: Annotated[
+        str, typer.Argument()
+    ] = "data_all/data_all_decrypted.unity3d",
 ) -> None:
     data_extractor = DataExtractor(data_all_decrypted_file_path)
     for asset_name in asset_names.split(","):
