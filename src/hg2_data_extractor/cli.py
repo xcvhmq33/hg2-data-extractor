@@ -23,9 +23,9 @@ def ask_for_rewrite_if_exists(file_path: str) -> bool:
 @app.command(help="Extracts all asset names from data_all_decrypted.unity3d")
 def lst(
     output_file_path: Annotated[str, typer.Argument()] = "extracted/asset_names.txt",
-    data_all_dir_path: Annotated[str, typer.Argument()] = "data_all",
+    data_all_file_path: Annotated[str, typer.Argument()] = "data_all/data_all_decrypted.unity3d",
 ) -> None:
-    data_extractor = DataExtractor(f"{data_all_dir_path}/data_all_decrypted.unity3d")
+    data_extractor = DataExtractor(data_all_file_path)
     if ask_for_rewrite_if_exists(output_file_path):
         data_extractor.extract_asset_names(output_file_path)
 
