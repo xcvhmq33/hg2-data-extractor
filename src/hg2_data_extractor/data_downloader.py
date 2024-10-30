@@ -31,7 +31,7 @@ class DataDownloader:
 
     def download_data_all(self, output_dir_path: str) -> None:
         Path(output_dir_path).mkdir(parents=True, exist_ok=True)
-        output_file_path = Path(output_dir_path) / "data_all_encrypted.unity3d"
+        output_file_path = Path(output_dir_path) / "data_all.unity3d"
         data_version_file = self._get_data_version_file()
         data_json = self._parse_data_json(data_version_file)
         data_all_name = self._parse_data_all_name(data_json)
