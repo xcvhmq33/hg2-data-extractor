@@ -88,5 +88,5 @@ class DataDownloader:
     @staticmethod
     def _validate_version(version: str) -> None:
         if not re.match(r"^(?:[1-9]|[1-9]\d)[.|_][0-9]$", version):
-            msg = "Version must be a valid number without trailing zeros(e.g. 7_8 or 11.1)"
+            msg = "Version must be a valid game version (e.g `11_1` or `9.8`)"
             raise ValueError(msg)

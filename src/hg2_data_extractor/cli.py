@@ -23,7 +23,9 @@ def ask_for_rewrite_if_exists(file_path: str) -> bool:
 @app.command(help="Extracts all asset names from data_all_dec.unity3d")
 def lst(
     output_file_path: Annotated[str, typer.Argument()] = "extracted/asset_names.txt",
-    data_all_file_path: Annotated[str, typer.Argument()] = "data_all/data_all_dec.unity3d",
+    data_all_file_path: Annotated[
+        str, typer.Argument()
+    ] = "data_all/data_all_dec.unity3d",
 ) -> None:
     data_extractor = DataExtractor(data_all_file_path)
     if ask_for_rewrite_if_exists(output_file_path):
@@ -43,9 +45,7 @@ def download(
 
 @app.command(help="Decrypts data_all.unity3d")
 def decrypt(
-    input_file_path: Annotated[
-        str, typer.Argument()
-    ] = "data_all/data_all.unity3d",
+    input_file_path: Annotated[str, typer.Argument()] = "data_all/data_all.unity3d",
     output_file_path: Annotated[
         str, typer.Argument()
     ] = "data_all/data_all_dec.unity3d",
@@ -58,7 +58,8 @@ def decrypt(
 def extract(
     asset_names: Annotated[
         str, typer.Argument()
-    ] = "WeaponDataV3,CostumeDataV2,PassiveSkillDataV3,SpecialAttributeDataV2,PetData,PetSkillData",
+    ] = "WeaponDataV3,CostumeDataV2,PassiveSkillDataV3, \
+         SpecialAttributeDataV2,PetData,PetSkillData",
     output_dir_path: Annotated[str, typer.Argument()] = "extracted",
     data_all_file_path: Annotated[
         str, typer.Argument()
