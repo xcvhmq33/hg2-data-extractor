@@ -58,8 +58,7 @@ def decrypt(
 def extract(
     asset_names: Annotated[
         str, typer.Argument()
-    ] = "WeaponDataV3,CostumeDataV2,PassiveSkillDataV3, \
-         SpecialAttributeDataV2,PetData,PetSkillData",
+    ] = "WeaponDataV3,CostumeDataV2,PassiveSkillDataV3,SpecialAttributeDataV2,PetData,PetSkillData",
     output_dir_path: Annotated[str, typer.Argument()] = "extracted",
     data_all_file_path: Annotated[
         str, typer.Argument()
