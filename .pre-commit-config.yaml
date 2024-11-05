@@ -6,7 +6,7 @@ repos:
       - id: check-toml
       - id: check-yaml
       - id: end-of-file-fixer
-        exclude: "^LICENSE|README\.md$"
+        exclude: "LICENSE|README.md"
       - id: trailing-whitespace
   - repo: https://github.com/astral-sh/ruff-pre-commit
     rev: v0.6.9
