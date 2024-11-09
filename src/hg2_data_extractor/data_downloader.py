@@ -31,7 +31,9 @@ class DataDownloader:
         self.version = version.replace(".", "_").strip()
         self.data_url = self._get_data_url()
 
-    def download_data_all(self, output_dir_path: str | Path) -> None:
+    def download_data_all(
+        self, output_dir_path: str | Path, progressbar: bool = False
+    ) -> None:
         output_dir_path = to_path(output_dir_path)
         output_dir_path.mkdir(parents=True, exist_ok=True)
         output_file_path = output_dir_path / "data_all.unity3d"
@@ -41,12 +43,17 @@ class DataDownloader:
         data_all_url = f"{self.data_url}/AssetBundles/{data_all_name}"
 
         with TqdmUpTo(
-            unit="B", unit_scale=True, unit_divisor=1024, miniters=1, desc="data_all"
-        ) as progressbar:
+            unit="B",
+            unit_scale=True,
+            unit_divisor=1024,
+            miniters=1,
+            desc="data_all",
+            disable=(not progressbar),
+        ) as t:
             urllib.request.urlretrieve(
-                data_all_url, output_file_path, reporthook=progressbar.update_to
+                data_all_url, output_file_path, reporthook=t.update_to
             )
-            progressbar.total = progressbar.n
+            t.total = t.n
 
     def _get_data_url(self) -> str:
         data_urls = {

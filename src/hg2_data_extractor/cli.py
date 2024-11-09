@@ -31,7 +31,7 @@ def download(
     output_file_path = f"{output_dir_path}/data_all.unity3d"
     if ask_overwrite_if_exists(output_file_path):
         data_downloader = DataDownloader(server, version)
-        data_downloader.download_data_all(output_dir_path)
+        data_downloader.download_data_all(output_dir_path, progressbar=True)
 
 
 @app.command(help="Decrypts data_all.unity3d")
