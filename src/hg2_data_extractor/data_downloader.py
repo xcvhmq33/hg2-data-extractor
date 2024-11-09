@@ -9,6 +9,8 @@ from requests.exceptions import HTTPError
 from tqdm import tqdm
 from UnityPy.classes import TextAsset
 
+from .utils import to_path
+
 
 class TqdmUpTo(tqdm):
     def update_to(
@@ -29,9 +31,10 @@ class DataDownloader:
         self.version = version.replace(".", "_").strip()
         self.data_url = self._get_data_url()
 
-    def download_data_all(self, output_dir_path: str) -> None:
-        Path(output_dir_path).mkdir(parents=True, exist_ok=True)
-        output_file_path = Path(output_dir_path) / "data_all.unity3d"
+    def download_data_all(self, output_dir_path: str | Path) -> None:
+        output_dir_path = to_path(output_dir_path)
+        output_dir_path.mkdir(parents=True, exist_ok=True)
+        output_file_path = output_dir_path / "data_all.unity3d"
         data_version_file = self._get_data_version_file()
         data_json = self._parse_data_json(data_version_file)
         data_all_name = self._parse_data_all_name(data_json)

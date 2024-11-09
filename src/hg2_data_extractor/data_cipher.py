@@ -3,6 +3,8 @@ from pathlib import Path
 from Crypto.Cipher import AES
 from Crypto.Util.Padding import pad, unpad
 
+from .utils import to_path
+
 
 class DataCipher:
     _AES_KEY = bytes.fromhex(
@@ -12,12 +14,16 @@ class DataCipher:
     _AES_IV = bytes.fromhex("81 e0 ca d4 a5 df 51 da 37 ba 49 ee cc 8a 4f fe")
 
     @classmethod
-    def decrypt_file(cls, input_file_path: str, output_file_path: str) -> None:
-        with Path(input_file_path).open("rb") as input_file:
+    def decrypt_file(
+        cls, input_file_path: str | Path, output_file_path: str | Path
+    ) -> None:
+        input_file_path = to_path(input_file_path)
+        with input_file_path.open("rb") as input_file:
             input_file_encrypted = input_file.read()
             input_file_decrypted = cls.decrypt_bytes(input_file_encrypted)
 
-        with Path(output_file_path).open("wb") as output_file:
+        output_file_path = to_path(output_file_path)
+        with output_file_path.open("wb") as output_file:
             output_file.write(input_file_decrypted)
 
     @classmethod
@@ -28,12 +34,16 @@ class DataCipher:
         return data_decrypted
 
     @classmethod
-    def encrypt_file(cls, input_file_path: str, output_file_path: str) -> None:
-        with Path(input_file_path).open("rb") as input_file:
+    def encrypt_file(
+        cls, input_file_path: str | Path, output_file_path: str | Path
+    ) -> None:
+        input_file_path = to_path(input_file_path)
+        with input_file_path.open("rb") as input_file:
             input_file_decrypted = input_file.read()
             input_file_encrypted = cls.encrypt_bytes(input_file_decrypted)
 
-        with Path(output_file_path).open("wb") as output_file:
+        output_file_path = to_path(output_file_path)
+        with output_file_path.open("wb") as output_file:
             output_file.write(input_file_encrypted)
 
     @classmethod
