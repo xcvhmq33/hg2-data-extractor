@@ -8,8 +8,9 @@ from .exceptions import AssetNotFoundError
 
 class DataExtractor:
     def __init__(self, data_all_file_path: Path):
-        self._validate_file_exists(data_all_file_path)
-
+        if not data_all_file_path.exists():
+            msg = f"Data_all file not found: {data_all_file_path}."
+            raise FileNotFoundError(msg)
         self.data_all_file_path = data_all_file_path
         self.data_all_bundle = UnityPy.load(data_all_file_path)
 
@@ -34,8 +35,3 @@ class DataExtractor:
 
     def get_asset_names(self) -> list[str]:
         return [Path(asset_path).stem for asset_path in self.data_all_bundle.container]
-
-    def _validate_file_exists(self, file_path: Path) -> None:
-        if not file_path.is_file():
-            msg = f"File {file_path} is not found"
-            raise FileNotFoundError(msg)
