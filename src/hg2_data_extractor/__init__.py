@@ -2,5 +2,5 @@ from hg2_data_extractor.data_cipher import DataCipher
 from hg2_data_extractor.data_downloader import DataDownloader
 from hg2_data_extractor.data_extractor import DataExtractor
 
-__version__ = "0.4.19"
+__version__ = "0.4.20"
 __all__ = ["DataCipher", "DataDownloader", "DataExtractor"]

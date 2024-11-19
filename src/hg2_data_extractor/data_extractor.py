@@ -16,18 +16,22 @@ class DataExtractor:
         if not self.data_all_bundle.container:
             msg = f"No assets found in the {self.data_all_file_path}."
             raise AssetNotFoundError(msg)
+        self.asset_map = {
+            Path(asset).stem: asset_reader
+            for asset, asset_reader in self.data_all_bundle.container.items()
+        }
 
     def extract_asset(self, asset_name: str, output_dir_path: Path) -> None:
         output_dir_path.mkdir(parents=True, exist_ok=True)
-        for asset_path, asset_reader in self.data_all_bundle.container.items():
-            if asset_name.lower() == Path(asset_path).stem:
-                asset: TextAsset = asset_reader.read()
-                output_file_path = output_dir_path / f"{asset.m_Name}.tsv"
-                with output_file_path.open("wb") as output_file:
-                    output_file.write(asset.m_Script.encode("utf-8", "surrogateescape"))
-                    return
-        msg = f"Asset not found: {asset_name}"
-        raise AssetNotFoundError(msg)
+        asset_reader = self.asset_map.get(asset_name.lower())
+        if asset_reader:
+            asset_obj: TextAsset = asset_reader.read()
+            output = output_dir_path / f"{asset_obj.m_Name}.tsv"
+            with output.open("wb") as file:
+                file.write(asset_obj.m_Script.encode("utf-8", "surrogateescape"))
+        else:
+            msg = f"Asset `{asset_name}` not found in {self.data_all_file_path}."
+            raise AssetNotFoundError(msg)
 
     def extract_asset_names(self, output_file_path: Path) -> None:
         output_dir_path = output_file_path.parent
