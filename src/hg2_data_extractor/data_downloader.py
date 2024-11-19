@@ -1,6 +1,5 @@
 import json
 import re
-import urllib.request
 from pathlib import Path
 
 import requests
@@ -10,16 +9,6 @@ from tqdm import tqdm
 from UnityPy.classes import TextAsset
 
 from .enums import Server
-
-
-class TqdmUpTo(tqdm):
-    def update_to(
-        self, blocks: int = 1, block_size: int = 1, total_size: int | None = None
-    ) -> bool | None:
-        if total_size is not None:
-            self.total = total_size
-
-        return self.update(blocks * block_size - self.n)
 
 
 class DataDownloader:
@@ -38,19 +27,25 @@ class DataDownloader:
         data_json = self._parse_data_json(data_version_file)
         data_all_name = self._parse_data_all_name(data_json)
         data_all_url = f"{self.data_url}/AssetBundles/{data_all_name}"
-
-        with TqdmUpTo(
-            unit="B",
-            unit_scale=True,
-            unit_divisor=1024,
-            miniters=1,
-            desc="data_all",
-            disable=(not progressbar),
-        ) as t:
-            urllib.request.urlretrieve(
-                data_all_url, output_file_path, reporthook=t.update_to
-            )
-            t.total = t.n
+        response = requests.get(data_all_url, stream=True)
+        response.raise_for_status()
+        total_size = int(response.headers.get("Content-Length", 0))
+        with (
+            tqdm(
+                desc=output_file_path.name,
+                unit="B",
+                miniters=1,
+                unit_divisor=1024,
+                total=total_size,
+                unit_scale=True,
+                disable=(not progressbar),
+            ) as t,
+            output_file_path.open("wb") as f,
+        ):
+            for chunk in response.iter_content(chunk_size=1024):
+                if chunk:
+                    t.update(len(chunk))
+                    f.write(chunk)
 
     def _get_data_url(self) -> str:
         data_urls = {
