@@ -21,7 +21,7 @@ def lst(
     ),
 ) -> None:
     data_extractor = DataExtractor(data_all_file_path)
-    data_extractor.extract_asset_names(output_file_path)
+    data_extractor.list_asset_names(output_file_path)
 
 
 @app.command(help="Downloads data_all.unity3d from server")
