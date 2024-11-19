@@ -175,7 +175,7 @@ wheels = [
 
 [[package]]
 name = "hg2-data-extractor"
-version = "0.4.5"
+version = "0.5.0"
 source = { editable = "." }
 dependencies = [
     { name = "pycryptodome" },
@@ -197,8 +197,8 @@ dev = [
 requires-dist = [
     { name = "pycryptodome", specifier = ">=3.21.0,<4.0.0" },
     { name = "requests", specifier = ">=2.32.3,<3.0.0" },
-    { name = "tqdm", specifier = ">=4.66.5" },
-    { name = "typer", specifier = ">=0.12.5" },
+    { name = "tqdm", specifier = ">=4.66.5,<5.0.0" },
+    { name = "typer", specifier = ">=0.12.5,<1.0.0" },
     { name = "unitypy", specifier = ">=1.20.4,<2.0.0" },
 ]
 
