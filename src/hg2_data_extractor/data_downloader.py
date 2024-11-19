@@ -27,12 +27,17 @@ class DataDownloader:
         data_json = self.parse_data_json(data_version_file)
         data_all_name = self.parse_data_all_name(data_json)
         data_all_url = f"{self.data_url}/AssetBundles/{data_all_name}"
-        response = requests.get(data_all_url, stream=True)
+        self.download_file(data_all_url, output_file_path, progressbar=progressbar)
+
+    def download_file(
+        self, url: str, output: Path, *, progressbar: bool = False
+    ) -> None:
+        response = requests.get(url, stream=True)
         response.raise_for_status()
         total_size = int(response.headers.get("Content-Length", 0))
         with (
             tqdm(
-                desc=output_file_path.name,
+                desc=output.name,
                 unit="B",
                 miniters=1,
                 unit_divisor=1024,
@@ -40,7 +45,7 @@ class DataDownloader:
                 unit_scale=True,
                 disable=(not progressbar),
             ) as t,
-            output_file_path.open("wb") as f,
+            output.open("wb") as f,
         ):
             for chunk in response.iter_content(chunk_size=1024):
                 if chunk:
