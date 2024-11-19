@@ -1,4 +1,3 @@
-from collections.abc import Iterable
 from pathlib import Path
 
 import UnityPy
@@ -13,10 +12,6 @@ class DataExtractor:
 
         self.data_all_file_path = data_all_file_path
         self.data_all_bundle = UnityPy.load(data_all_file_path)
-
-    def extract_assets(self, asset_names: Iterable[str], output_dir_path: Path) -> None:
-        for asset_name in asset_names:
-            self.extract_asset(asset_name, output_dir_path)
 
     def extract_asset(self, asset_name: str, output_dir_path: Path) -> None:
         output_dir_path.mkdir(parents=True, exist_ok=True)
