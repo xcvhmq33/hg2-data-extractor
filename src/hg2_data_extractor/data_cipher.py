@@ -12,7 +12,11 @@ class DataCipher:
     _AES_IV = bytes.fromhex("81 e0 ca d4 a5 df 51 da 37 ba 49 ee cc 8a 4f fe")
 
     @classmethod
-    def decrypt_file(cls, input: Path, output: Path) -> None:
+    def decrypt_file(cls, input: Path, output_dir: Path | None = None) -> None:
+        if output_dir is None:
+            output_dir = input.parent
+        output = output_dir / f"{input.stem}_dec{input.suffix}"
+
         with input.open("rb") as file:
             input_encrypted = file.read()
             input_decrypted = cls.decrypt_bytes(input_encrypted)
@@ -28,7 +32,11 @@ class DataCipher:
         return decrypted
 
     @classmethod
-    def encrypt_file(cls, input: Path, output: Path) -> None:
+    def encrypt_file(cls, input: Path, output_dir: Path | None = None) -> None:
+        if output_dir is None:
+            output_dir = input.parent
+        output = output_dir / f"{input.stem}_enc{input.suffix}"
+
         with input.open("rb") as file:
             input_decrypted = file.read()
             input_encrypted = cls.encrypt_bytes(input_decrypted)

@@ -39,11 +39,9 @@ def decrypt(
     input_file_path: Annotated[Path, typer.Argument()] = Path(
         "data_all/data_all.unity3d"
     ),
-    output_file_path: Annotated[Path, typer.Argument()] = Path(
-        "data_all/data_all_dec.unity3d"
-    ),
+    output_path: Annotated[Path, typer.Argument()] = Path("data_all"),
 ) -> None:
-    DataCipher.decrypt_file(input_file_path, output_file_path)
+    DataCipher.decrypt_file(input_file_path, output_path)
 
 
 @app.command(help="Extracts text assets data from data_all_dec.unity3d")
