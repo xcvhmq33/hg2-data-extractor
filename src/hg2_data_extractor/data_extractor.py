@@ -4,24 +4,19 @@ from pathlib import Path
 import UnityPy
 from UnityPy.classes import TextAsset
 
-from .utils import to_path
-
 
 class DataExtractor:
-    def __init__(self, data_all_file_path: str | Path):
+    def __init__(self, data_all_file_path: Path):
         self._validate_file_exists(data_all_file_path)
 
         self.data_all_file_path = data_all_file_path
         self.data_all_bundle = UnityPy.load(data_all_file_path)
 
-    def extract_assets(
-        self, asset_names: Iterable[str], output_dir_path: str | Path
-    ) -> None:
+    def extract_assets(self, asset_names: Iterable[str], output_dir_path: Path) -> None:
         for asset_name in asset_names:
             self.extract_asset(asset_name, output_dir_path)
 
-    def extract_asset(self, asset_name: str, output_dir_path: str | Path) -> None:
-        output_dir_path = to_path(output_dir_path)
+    def extract_asset(self, asset_name: str, output_dir_path: Path) -> None:
         output_dir_path.mkdir(parents=True, exist_ok=True)
         for asset_path, asset_reader in self.data_all_bundle.container.items():
             if asset_name.lower() == Path(asset_path).stem:
@@ -30,19 +25,17 @@ class DataExtractor:
                 with output_file_path.open("wb") as output_file:
                     output_file.write(asset.m_Script.encode("utf-8", "surrogateescape"))
 
-    def extract_asset_names(self, output_file_path: str | Path) -> None:
-        output_dir_path = to_path(output_file_path).parent
+    def extract_asset_names(self, output_file_path: Path) -> None:
+        output_dir_path = output_file_path.parent
         output_dir_path.mkdir(parents=True, exist_ok=True)
         asset_names = self.get_asset_names()
-        output_file_path = to_path(output_file_path)
         with output_file_path.open("w+") as output_file:
             output_file.write("\n".join(asset_names))
 
     def get_asset_names(self) -> list[str]:
         return [Path(asset_path).stem for asset_path in self.data_all_bundle.container]
 
-    def _validate_file_exists(self, file_path: str | Path) -> None:
-        file_path = to_path(file_path)
+    def _validate_file_exists(self, file_path: Path) -> None:
         if not file_path.is_file():
             msg = f"File {file_path} is not found"
             raise FileNotFoundError(msg)

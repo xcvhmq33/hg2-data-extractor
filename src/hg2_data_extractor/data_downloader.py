@@ -10,7 +10,6 @@ from tqdm import tqdm
 from UnityPy.classes import TextAsset
 
 from .enums import Server
-from .utils import to_path
 
 
 class TqdmUpTo(tqdm):
@@ -31,9 +30,8 @@ class DataDownloader:
         self.data_url = self._get_data_url()
 
     def download_data_all(
-        self, output_dir_path: str | Path, progressbar: bool = False
+        self, output_dir_path: Path, progressbar: bool = False
     ) -> None:
-        output_dir_path = to_path(output_dir_path)
         output_dir_path.mkdir(parents=True, exist_ok=True)
         output_file_path = output_dir_path / "data_all.unity3d"
         data_version_file = self._get_data_version_file()

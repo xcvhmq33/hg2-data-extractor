@@ -1,3 +1,4 @@
+from pathlib import Path
 from typing import Annotated
 
 import typer
@@ -12,10 +13,12 @@ app = typer.Typer()
 
 @app.command(help="Extracts all asset names from data_all_dec.unity3d")
 def lst(
-    output_file_path: Annotated[str, typer.Argument()] = "extracted/asset_names.txt",
-    data_all_file_path: Annotated[
-        str, typer.Argument()
-    ] = "data_all/data_all_dec.unity3d",
+    output_file_path: Annotated[Path, typer.Argument()] = Path(
+        "extracted/asset_names.txt"
+    ),
+    data_all_file_path: Annotated[Path, typer.Argument()] = Path(
+        "data_all/data_all_dec.unity3d"
+    ),
 ) -> None:
     data_extractor = DataExtractor(data_all_file_path)
     data_extractor.extract_asset_names(output_file_path)
@@ -25,7 +28,7 @@ def lst(
 def download(
     server: Server,
     version: str,
-    output_dir_path: Annotated[str, typer.Argument()] = "data_all",
+    output_dir_path: Annotated[Path, typer.Argument()] = Path("data_all"),
 ) -> None:
     data_downloader = DataDownloader(server, version)
     data_downloader.download_data_all(output_dir_path, progressbar=True)
@@ -33,10 +36,12 @@ def download(
 
 @app.command(help="Decrypts data_all.unity3d")
 def decrypt(
-    input_file_path: Annotated[str, typer.Argument()] = "data_all/data_all.unity3d",
-    output_file_path: Annotated[
-        str, typer.Argument()
-    ] = "data_all/data_all_dec.unity3d",
+    input_file_path: Annotated[Path, typer.Argument()] = Path(
+        "data_all/data_all.unity3d"
+    ),
+    output_file_path: Annotated[Path, typer.Argument()] = Path(
+        "data_all/data_all_dec.unity3d"
+    ),
 ) -> None:
     DataCipher.decrypt_file(input_file_path, output_file_path)
 
@@ -46,10 +51,10 @@ def extract(
     asset_names: Annotated[
         str, typer.Argument()
     ] = "WeaponDataV3,CostumeDataV2,PassiveSkillDataV3,SpecialAttributeDataV2,PetData,PetSkillData",
-    output_dir_path: Annotated[str, typer.Argument()] = "extracted",
-    data_all_file_path: Annotated[
-        str, typer.Argument()
-    ] = "data_all/data_all_dec.unity3d",
+    output_dir_path: Annotated[Path, typer.Argument()] = Path("extracted"),
+    data_all_file_path: Annotated[Path, typer.Argument()] = Path(
+        "data_all/data_all_dec.unity3d"
+    ),
 ) -> None:
     data_extractor = DataExtractor(data_all_file_path)
     for asset_name in asset_names.split(","):
