@@ -12,33 +12,33 @@ class DataCipher:
     _AES_IV = bytes.fromhex("81 e0 ca d4 a5 df 51 da 37 ba 49 ee cc 8a 4f fe")
 
     @classmethod
-    def decrypt_file(cls, input_file_path: Path, output_file_path: Path) -> None:
-        with input_file_path.open("rb") as input_file:
-            input_file_encrypted = input_file.read()
-            input_file_decrypted = cls.decrypt_bytes(input_file_encrypted)
+    def decrypt_file(cls, input: Path, output: Path) -> None:
+        with input.open("rb") as file:
+            input_encrypted = file.read()
+            input_decrypted = cls.decrypt_bytes(input_encrypted)
 
-        with output_file_path.open("wb") as output_file:
-            output_file.write(input_file_decrypted)
+        with output.open("wb") as file:
+            file.write(input_decrypted)
 
     @classmethod
-    def decrypt_bytes(cls, data_encrypted: bytes) -> bytes:
+    def decrypt_bytes(cls, input: bytes) -> bytes:
         cipher = AES.new(cls._AES_KEY, AES.MODE_CBC, cls._AES_IV)
-        data_decrypted = unpad(cipher.decrypt(data_encrypted), AES.block_size)
+        decrypted = unpad(cipher.decrypt(input), AES.block_size)
 
-        return data_decrypted
-
-    @classmethod
-    def encrypt_file(cls, input_file_path: Path, output_file_path: Path) -> None:
-        with input_file_path.open("rb") as input_file:
-            input_file_decrypted = input_file.read()
-            input_file_encrypted = cls.encrypt_bytes(input_file_decrypted)
-
-        with output_file_path.open("wb") as output_file:
-            output_file.write(input_file_encrypted)
+        return decrypted
 
     @classmethod
-    def encrypt_bytes(cls, data_decrypted: bytes) -> bytes:
+    def encrypt_file(cls, input: Path, output: Path) -> None:
+        with input.open("rb") as file:
+            input_decrypted = file.read()
+            input_encrypted = cls.encrypt_bytes(input_decrypted)
+
+        with output.open("wb") as file:
+            file.write(input_encrypted)
+
+    @classmethod
+    def encrypt_bytes(cls, input: bytes) -> bytes:
         cipher = AES.new(cls._AES_KEY, AES.MODE_CBC, cls._AES_IV)
-        data_encrypted = cipher.encrypt(pad(data_decrypted, AES.block_size))
+        encrypted = cipher.encrypt(pad(input, AES.block_size))
 
-        return data_encrypted
+        return encrypted
