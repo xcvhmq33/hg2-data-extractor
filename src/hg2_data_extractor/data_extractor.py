@@ -36,9 +36,5 @@ class DataExtractor:
     def extract_asset_names(self, output_file_path: Path) -> None:
         output_dir_path = output_file_path.parent
         output_dir_path.mkdir(parents=True, exist_ok=True)
-        asset_names = self.get_asset_names()
         with output_file_path.open("w+") as output_file:
-            output_file.write("\n".join(asset_names))
-
-    def get_asset_names(self) -> list[str]:
-        return [Path(asset_path).stem for asset_path in self.data_all_bundle.container]
+            output_file.write("\n".join(self.asset_map))
