@@ -13,6 +13,9 @@ class DataExtractor:
             raise FileNotFoundError(msg)
         self.data_all_file_path = data_all_file_path
         self.data_all_bundle = UnityPy.load(data_all_file_path)
+        if not self.data_all_bundle.container:
+            msg = f"No assets found in the {self.data_all_file_path}."
+            raise AssetNotFoundError(msg)
 
     def extract_asset(self, asset_name: str, output_dir_path: Path) -> None:
         output_dir_path.mkdir(parents=True, exist_ok=True)
