@@ -83,6 +83,13 @@ class DataDownloader:
 
     @staticmethod
     def validate_version(version: str) -> None:
-        if not re.match(r"^(?:[1-9]|[1-9]\d)[.|_][0-9]$", version):
-            msg = "Version must be a valid game version (e.g `11_1` or `9.8`)"
+        pattern = r"""
+            ^                   # begin
+            [1-9]\d*            # first part of the version
+            [.|_]               # separator
+            \d+                 # second part of the version
+            $                   # end
+        """
+        if not re.match(pattern, version, re.VERBOSE):
+            msg = f"Invalid version format: {version}. Expected x_y or x.y"
             raise ValueError(msg)
