@@ -4,6 +4,8 @@ from pathlib import Path
 import UnityPy
 from UnityPy.classes import TextAsset
 
+from .exceptions import AssetNotFoundError
+
 
 class DataExtractor:
     def __init__(self, data_all_file_path: Path):
@@ -24,6 +26,9 @@ class DataExtractor:
                 output_file_path = output_dir_path / f"{asset.m_Name}.tsv"
                 with output_file_path.open("wb") as output_file:
                     output_file.write(asset.m_Script.encode("utf-8", "surrogateescape"))
+                    return
+        msg = f"Asset not found: {asset_name}"
+        raise AssetNotFoundError(msg)
 
     def extract_asset_names(self, output_file_path: Path) -> None:
         output_dir_path = output_file_path.parent
