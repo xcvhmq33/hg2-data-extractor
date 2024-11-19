@@ -9,6 +9,7 @@ from requests.exceptions import HTTPError
 from tqdm import tqdm
 from UnityPy.classes import TextAsset
 
+from .enums import Server
 from .utils import to_path
 
 
@@ -23,11 +24,9 @@ class TqdmUpTo(tqdm):
 
 
 class DataDownloader:
-    def __init__(self, server: str, version: str):
-        self._validate_server(server)
+    def __init__(self, server: Server, version: str):
+        self.server = server
         self._validate_version(version)
-
-        self.server = server.lower().strip()
         self.version = version.replace(".", "_").strip()
         self.data_url = self._get_data_url()
 
@@ -57,8 +56,8 @@ class DataDownloader:
 
     def _get_data_url(self) -> str:
         data_urls = {
-            "cn": f"https://assets.hsod2.benghuai.com/asset_bundle/{self.version}/original/android/Data",
-            "jp": f"https://s3-ap-northeast-1.amazonaws.com/hsod2-asset/asset_bundle/{self.version}/jporiginal/android/Data",
+            Server.CN: f"https://assets.hsod2.benghuai.com/asset_bundle/{self.version}/original/android/Data",
+            Server.JP: f"https://s3-ap-northeast-1.amazonaws.com/hsod2-asset/asset_bundle/{self.version}/jporiginal/android/Data",
         }
 
         return data_urls[self.server]
@@ -88,12 +87,6 @@ class DataDownloader:
         data_all_name = f"{n}_{hs}_{crc}"
 
         return data_all_name
-
-    @staticmethod
-    def _validate_server(server: str) -> None:
-        if server.lower() not in ["cn", "jp"]:
-            msg = "Server must be CN or JP"
-            raise ValueError(msg)
 
     @staticmethod
     def _validate_version(version: str) -> None:

@@ -5,6 +5,7 @@ import typer
 from .data_cipher import DataCipher
 from .data_downloader import DataDownloader
 from .data_extractor import DataExtractor
+from .enums import Server
 from .utils import ask_overwrite_if_exists
 
 app = typer.Typer()
@@ -24,7 +25,7 @@ def lst(
 
 @app.command(help="Downloads data_all.unity3d from server")
 def download(
-    server: str,
+    server: Server,
     version: str,
     output_dir_path: Annotated[str, typer.Argument()] = "data_all",
 ) -> None:
