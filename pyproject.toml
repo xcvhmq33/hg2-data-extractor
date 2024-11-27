@@ -62,8 +62,6 @@ select = [
     "RUF003", # ambiguous-unicode-character-comment
 ]
 ignore = [
-    "ANN101", # missing-type-self
-    "ANN102", # missing-type-cls
     "ANN204", # missing-return-type-special-method (dunder methods)
 ]
 
