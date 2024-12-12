@@ -17,6 +17,7 @@ The CLI offers several commands for processing data. Below is a quick summary:
 | `download`     | Downloads the `data_all.unity3d` file from a server.                        |
 | `decrypt`      | Decrypts the `data_all.unity3d` file into a ready-to-extract format.        |
 | `extract`      | Extracts specific assets or a preset of assets into `.tsv` files.           |
+| `resources`    | Downloads resource files from a server (e.g., auido.pck, video.mp4).        |
 
 ---
 
@@ -82,6 +83,22 @@ hg2-data-extractor extract <asset-names> --preset items --asset-file assets.txt 
 | `--asset-file`, `-f`  | Path to a file with line-separated asset names.         | `None`                           |
 | `--output-dir`, `-o`  | Directory to save the extracted files.                  | `extracted`                      |
 | `--data-all`, `-d`    | Path to the decrypted `data_all` file.                  | `data_all/data_all_dec.unity3d`  |
+
+---
+
+### **5. Download Resources**
+Downloads resource files from a server (e.g., auido.pck, video.mp4).
+
+```bash
+hg2-data-extractor resources <server> <version> --overwrite --output-dir resources
+```
+
+| Option        | Description                                           | Default Value     |
+|---------------|-------------------------------------------------------|-------------------|
+| `<server>`    | The server to download from (`CN`, `JP`).             | *Required*        |
+| `<version>`   | The version of the game (e.g., `11.1` or `9_8`).      | *Required*        |
+| `--overwrite` | Overwrites existing files.                            | `False`           |
+| `--output-dir`, `-o` | Directory to save the downloaded file.         | `resources`       |
 
 ---
 
