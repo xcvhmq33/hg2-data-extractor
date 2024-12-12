@@ -53,9 +53,12 @@ class DataDownloader:
     def parse_data_all_name(self, data_json: str) -> str:
         parsed_data_json: dict[str, str] = json.loads(data_json)
         n = parsed_data_json["N"]
-        hs = parsed_data_json["HS"]
         crc = parsed_data_json["CRC"]
-        data_all_name = f"{n}_{hs}_{crc}"
+        if float(self.version.replace("_", ".")) < 11.4:
+            hs = parsed_data_json["HS"]
+            data_all_name = f"{n}_{hs}_{crc}"
+        else:
+            data_all_name = f"{n}_{crc}"
 
         return data_all_name
 
