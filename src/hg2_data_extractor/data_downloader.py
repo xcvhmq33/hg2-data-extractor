@@ -1,5 +1,6 @@
 import json
 import re
+from dataclasses import dataclass
 from pathlib import Path
 
 import requests
@@ -12,25 +13,63 @@ from .config import settings
 from .enums import Server
 
 
+@dataclass
+class Resource:
+    N: str
+    FS: str
+    CRC: str
+    PN: str
+    ULM: str
+    DLM: str
+    BT: str
+    R: str
+    APS: list[str]
+    HS: str | None = None
+
+    @property
+    def full_name(self) -> str:
+        if self.HS is not None:
+            return f"{self.N}_{self.HS}_{self.CRC}"
+        return f"{self.N}_{self.CRC}"
+
+    @property
+    def file_name(self) -> str:
+        return str(Path(self.N).name)
+
+
 class DataDownloader:
     def __init__(self, server: Server, version: str):
         self.server = server
         self.validate_version(version)
         self.version = version.replace(".", "_").strip()
         self.data_url = settings.create_data_url(version, server)
+        self.resources_url = settings.create_resources_url(version, server)
 
     def download_data_all(self, output_dir: Path, *, progressbar: bool = False) -> None:
         output_dir.mkdir(parents=True, exist_ok=True)
         output = output_dir / "data_all.unity3d"
         data_version = self.get_data_version()
-        data_json = self.parse_data_json(data_version)
-        data_all_name = self.parse_data_all_name(data_json)
-        data_all_url = f"{self.data_url}/AssetBundles/{data_all_name}"
+        data_json = self.parse_objects_json(data_version)[0]
+        data_all = Resource(**data_json)
+        data_all_url = f"{self.data_url}/AssetBundles/{data_all.full_name}"
         self.download_file(data_all_url, output, progressbar=progressbar)
 
-    def download_file(
-        self, url: str, output: Path, *, progressbar: bool = False
+    def download_resources(
+        self, output_dir: Path, *, progressbar: bool = False, overwrite: bool = False
     ) -> None:
+        output_dir.mkdir(parents=True, exist_ok=True)
+        resources_version = self.get_resources_version()
+        resources_json = self.parse_objects_json(resources_version)
+        resources = self.parse_resources(resources_json)
+        for resource in resources:
+            output = output_dir / resource.file_name
+            if output.is_file() and not overwrite:
+                continue
+            resource_url = f"{self.resources_url}/{resource.full_name}"
+            self.download_file(resource_url, output, progressbar=progressbar)
+
+    @staticmethod
+    def download_file(url: str, output: Path, *, progressbar: bool = False) -> None:
         response = requests.get(url, stream=True)
         response.raise_for_status()
         total_size = int(response.headers.get("Content-Length", 0))
@@ -51,30 +90,50 @@ class DataDownloader:
                     t.update(len(chunk))
                     f.write(chunk)
 
-    def parse_data_all_name(self, data_json: str) -> str:
-        parsed_data_json: dict[str, str] = json.loads(data_json)
-        n = parsed_data_json["N"]
-        crc = parsed_data_json["CRC"]
-        if float(self.version.replace("_", ".")) < 11.4:
-            hs = parsed_data_json["HS"]
-            data_all_name = f"{n}_{hs}_{crc}"
-        else:
-            data_all_name = f"{n}_{crc}"
+    @staticmethod
+    def parse_resources(
+        resources_json: list[dict[str, str]], *, filter: str | None = None
+    ) -> list[Resource]:
+        resources = []
+        for resource_json in resources_json:
+            resource = Resource(**resource_json)
+            if resource.N.startswith("StreamingAssets/"):
+                resources.append(resource)
 
-        return data_all_name
+        return resources
 
-    def parse_data_json(self, data_version: bytes) -> str:
-        bundle = UnityPy.load(data_version)
-        asset_reader = bundle.objects[1]
-        asset: TextAsset = asset_reader.read()
-        data_json = asset.m_Script.splitlines()[2]
+    @staticmethod
+    def parse_objects_json(unity_file: bytes) -> list[dict[str, str]]:
+        bundle = UnityPy.load(unity_file)
+        for asset_reader in bundle.objects:
+            asset = asset_reader.read()
+            if isinstance(asset, TextAsset):
+                object_json = asset.m_Script.splitlines()
+                parsed_objects_json = []
+                for i, file_json in enumerate(object_json):
+                    if i <= 1:
+                        continue
+                    parsed_object_json = json.loads(file_json)
+                    parsed_objects_json.append(parsed_object_json)
 
-        return data_json
+        return parsed_objects_json
 
     def get_data_version(self) -> bytes:
         data_version_url = f"{self.data_url}/DataVersion.unity3d"
+        data_version = self.get_file_version(data_version_url)
+
+        return data_version
+
+    def get_resources_version(self) -> bytes:
+        resources_version_url = f"{self.resources_url}/ResourceVersion.unity3d"
+        resources_version = self.get_file_version(resources_version_url)
+
+        return resources_version
+
+    @staticmethod
+    def get_file_version(file_url: str) -> bytes:
         try:
-            response = requests.get(data_version_url, timeout=10)
+            response = requests.get(file_url, timeout=10)
             response.raise_for_status()
         except HTTPError as e:
             msg = f"{e}\nIt's more likely the version is too low/high."

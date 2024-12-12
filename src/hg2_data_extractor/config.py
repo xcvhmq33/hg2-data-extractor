@@ -32,5 +32,10 @@ class Settings(BaseSettings):
         data_url = core_url + "Data"
         return data_url
 
+    def create_resources_url(self, version: str, server: Server) -> HttpUrl:
+        core_url = self.create_core_url(version, server)
+        resources_url = core_url + "Res"
+        return resources_url
+
 
 settings = Settings()

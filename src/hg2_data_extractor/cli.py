@@ -88,6 +88,32 @@ def download(
 
 @app.command()
 @handle_errors
+def resources(
+    server: Annotated[Server, typer.Argument(case_sensitive=False)],
+    version: Annotated[str, typer.Argument()],
+    output_dir: Annotated[
+        Path,
+        output_dir_option,
+    ] = Path("resources"),
+    overwrite: Annotated[
+        bool,
+        typer.Option(
+            "--overwrite",
+            help="Overwrites existing files.",
+        ),
+    ] = False,
+) -> None:
+    """
+    Downloads game resources (e.g. auido.pck, video.mp4)
+    """
+    data_downloader = DataDownloader(server, version)
+    data_downloader.download_resources(
+        output_dir, progressbar=True, overwrite=overwrite
+    )
+
+
+@app.command()
+@handle_errors
 def decrypt(
     input: Annotated[
         Path,

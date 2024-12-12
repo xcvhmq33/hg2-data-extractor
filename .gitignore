@@ -15,5 +15,8 @@ wheels/
 # Extracted files
 data_all/
 extracted/
+resources/
 *.unity3d
 *.tsv
+*.pck
+*.mp4
