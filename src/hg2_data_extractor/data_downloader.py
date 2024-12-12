@@ -8,6 +8,7 @@ from requests.exceptions import HTTPError
 from tqdm import tqdm
 from UnityPy.classes import TextAsset
 
+from .config import settings
 from .enums import Server
 
 
@@ -16,7 +17,7 @@ class DataDownloader:
         self.server = server
         self.validate_version(version)
         self.version = version.replace(".", "_").strip()
-        self.data_url = self.get_data_url()
+        self.data_url = settings.create_data_url(version, server)
 
     def download_data_all(self, output_dir: Path, *, progressbar: bool = False) -> None:
         output_dir.mkdir(parents=True, exist_ok=True)
@@ -80,14 +81,6 @@ class DataDownloader:
             raise ValueError(msg) from e
 
         return response.content
-
-    def get_data_url(self) -> str:
-        data_urls = {
-            Server.CN: f"https://assets.hsod2.benghuai.com/asset_bundle/{self.version}/original/android/Data",
-            Server.JP: f"https://s3-ap-northeast-1.amazonaws.com/hsod2-asset/asset_bundle/{self.version}/jporiginal/android/Data",
-        }
-
-        return data_urls[self.server]
 
     @staticmethod
     def validate_version(version: str) -> None:

@@ -6,6 +6,7 @@ requires-python = ">=3.12,<4.0"
 dynamic = ["version"]
 dependencies = [
     "pycryptodome<4.0.0,>=3.21.0",
+    "pydantic-settings<3.0.0,>=2.6.1",
     "requests<3.0.0,>=2.32.3",
     "tqdm<5.0.0,>=4.66.5",
     "typer<1.0.0,>=0.12.5",
