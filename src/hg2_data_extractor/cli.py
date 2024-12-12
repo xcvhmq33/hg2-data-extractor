@@ -1,6 +1,7 @@
 import functools
+from collections.abc import Callable
 from pathlib import Path
-from typing import Annotated
+from typing import Annotated, Any
 
 import typer
 
@@ -22,11 +23,21 @@ data_all_option = typer.Option(
     "-d",
     help="Path to the data_all_dec.unity3d file.",
 )
+OutputDirOption = Annotated[
+    Path,
+    output_dir_option,
+]
+DataAllOption = Annotated[
+    Path,
+    data_all_option,
+]
+ServerArgument = Annotated[Server, typer.Argument(case_sensitive=False)]
+VersionArgument = Annotated[str, typer.Argument()]
 
 
-def handle_errors(func):
+def handle_errors(func: Callable[[], Any]) -> Callable[[], Any]:
     @functools.wraps(func)
-    def wrapper(*args, **kwargs):
+    def wrapper(*args: tuple[Any], **kwargs: dict[Any, Any]) -> Any:
         try:
             return func(*args, **kwargs)
         except Exception as e:
@@ -36,17 +47,11 @@ def handle_errors(func):
     return wrapper
 
 
-@app.command()
+@app.command()  # type: ignore
 @handle_errors
 def lst(
-    output_dir: Annotated[
-        Path,
-        output_dir_option,
-    ] = Path("extracted"),
-    data_all: Annotated[
-        Path,
-        data_all_option,
-    ] = Path("data_all/data_all_dec.unity3d"),
+    output_dir: OutputDirOption = Path("extracted"),
+    data_all: DataAllOption = Path("data_all/data_all_dec.unity3d"),
 ) -> None:
     """
     Writes names list of all existed assets.
@@ -56,11 +61,11 @@ def lst(
     data_extractor.list_asset_names(output)
 
 
-@app.command()
+@app.command()  # type: ignore
 @handle_errors
 def download(
-    server: Annotated[Server, typer.Argument(case_sensitive=False)],
-    version: Annotated[str, typer.Argument()],
+    server: ServerArgument,
+    version: VersionArgument,
     decrypt_: Annotated[
         bool,
         typer.Option(
@@ -68,10 +73,7 @@ def download(
             help="Decrypts the downloaded data.",
         ),
     ] = False,
-    output_dir: Annotated[
-        Path,
-        output_dir_option,
-    ] = Path("data_all"),
+    output_dir: OutputDirOption = Path("data_all"),
 ) -> None:
     """
     Downloads data_all.unity3d
@@ -86,15 +88,12 @@ def download(
         )
 
 
-@app.command()
+@app.command()  # type: ignore
 @handle_errors
 def resources(
-    server: Annotated[Server, typer.Argument(case_sensitive=False)],
-    version: Annotated[str, typer.Argument()],
-    output_dir: Annotated[
-        Path,
-        output_dir_option,
-    ] = Path("resources"),
+    server: ServerArgument,
+    version: VersionArgument,
+    output_dir: OutputDirOption = Path("resources"),
     overwrite: Annotated[
         bool,
         typer.Option(
@@ -112,7 +111,7 @@ def resources(
     )
 
 
-@app.command()
+@app.command()  # type: ignore
 @handle_errors
 def decrypt(
     input: Annotated[
@@ -121,10 +120,7 @@ def decrypt(
             help="Path to the file that will be decrypted.",
         ),
     ] = Path("data_all/data_all.unity3d"),
-    output_dir: Annotated[
-        Path,
-        output_dir_option,
-    ] = Path("data_all"),
+    output_dir: OutputDirOption = Path("data_all"),
 ) -> None:
     """
     Decrypts data_all.unity3d.
@@ -132,15 +128,15 @@ def decrypt(
     DataCipher.decrypt_file(input, output_dir)
 
 
-@app.command()
+@app.command()  # type: ignore
 @handle_errors
 def extract(
     asset_names: Annotated[
-        list[str],
+        list[str] | None,
         typer.Argument(help="List of asset names that will be extraced."),
     ] = None,
     asset_file: Annotated[
-        Path,
+        Path | None,
         typer.Option(
             "--asset-file",
             "-f",
@@ -148,21 +144,15 @@ def extract(
         ),
     ] = None,
     preset: Annotated[
-        Preset,
+        Preset | None,
         typer.Option(
             "--preset",
             "-p",
             help="Preset of assets to extract. Overrides manual and file input.",
         ),
     ] = None,
-    output_dir: Annotated[
-        Path,
-        output_dir_option,
-    ] = Path("extracted"),
-    data_all: Annotated[
-        Path,
-        data_all_option,
-    ] = Path("data_all/data_all_dec.unity3d"),
+    output_dir: OutputDirOption = Path("extracted"),
+    data_all: DataAllOption = Path("data_all/data_all_dec.unity3d"),
 ) -> None:
     """
     Extracts provided assets.
@@ -175,7 +165,8 @@ def extract(
             asset_names = [line.strip() for line in file if line.strip()]
     elif not asset_names:
         typer.secho(
-            "You must provide either a list of asset names, or use --asset-file[-f], or use --preset[-p].",
+            "You must provide either a list of asset names, "
+            "or use --asset-file[-f], or use --preset[-p].",
             fg=typer.colors.RED,
             err=True,
         )

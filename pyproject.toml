@@ -64,6 +64,8 @@ select = [
 ]
 ignore = [
     "ANN204", # missing-return-type-special-method (dunder methods)
+    "ANN401", # any-type
+    "B904", # raise-without-from-inside-except
 ]
 
 [tool.ruff.format]

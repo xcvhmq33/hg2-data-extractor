@@ -2,6 +2,7 @@ import json
 import re
 from dataclasses import dataclass
 from pathlib import Path
+from typing import TypedDict
 
 import requests
 import UnityPy
@@ -13,8 +14,21 @@ from .config import settings
 from .enums import Server
 
 
+class GameObjectJSON(TypedDict):
+    N: str
+    FS: str
+    CRC: str
+    PN: str
+    ULM: str
+    DLM: str
+    BT: str
+    R: str
+    APS: list[str]
+    HS: str | None
+
+
 @dataclass
-class Resource:
+class GameObject:
     N: str
     FS: str
     CRC: str
@@ -50,7 +64,7 @@ class DataDownloader:
         output = output_dir / "data_all.unity3d"
         data_version = self.get_data_version()
         data_json = self.parse_objects_json(data_version)[0]
-        data_all = Resource(**data_json)
+        data_all = GameObject(**data_json)
         data_all_url = f"{self.data_url}/AssetBundles/{data_all.full_name}"
         self.download_file(data_all_url, output, progressbar=progressbar)
 
@@ -91,19 +105,17 @@ class DataDownloader:
                     f.write(chunk)
 
     @staticmethod
-    def parse_resources(
-        resources_json: list[dict[str, str]], *, filter: str | None = None
-    ) -> list[Resource]:
+    def parse_resources(resources_json: list[GameObjectJSON]) -> list[GameObject]:
         resources = []
         for resource_json in resources_json:
-            resource = Resource(**resource_json)
+            resource = GameObject(**resource_json)
             if resource.N.startswith("StreamingAssets/"):
                 resources.append(resource)
 
         return resources
 
     @staticmethod
-    def parse_objects_json(unity_file: bytes) -> list[dict[str, str]]:
+    def parse_objects_json(unity_file: bytes) -> list[GameObjectJSON]:
         bundle = UnityPy.load(unity_file)
         for asset_reader in bundle.objects:
             asset = asset_reader.read()

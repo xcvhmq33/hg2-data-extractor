@@ -29,7 +29,7 @@ class DataCipher:
         cipher = AES.new(cls._AES_KEY, AES.MODE_CBC, cls._AES_IV)
         decrypted = unpad(cipher.decrypt(input), AES.block_size)
 
-        return decrypted
+        return decrypted  # type: ignore
 
     @classmethod
     def encrypt_file(cls, input: Path, output_dir: Path | None = None) -> None:
@@ -49,4 +49,4 @@ class DataCipher:
         cipher = AES.new(cls._AES_KEY, AES.MODE_CBC, cls._AES_IV)
         encrypted = cipher.encrypt(pad(input, AES.block_size))
 
-        return encrypted
+        return encrypted  # type: ignore
