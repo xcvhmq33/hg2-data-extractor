@@ -35,7 +35,7 @@ ServerArgument = Annotated[Server, typer.Argument(case_sensitive=False)]
 VersionArgument = Annotated[str, typer.Argument()]
 
 
-def handle_errors(func: Callable[[], Any]) -> Callable[[], Any]:
+def handle_errors(func: Callable[[Any], Any]) -> Callable[[Any], Any]:
     @functools.wraps(func)
     def wrapper(*args: tuple[Any], **kwargs: dict[Any, Any]) -> Any:
         try:
