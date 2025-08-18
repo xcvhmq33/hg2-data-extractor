@@ -89,7 +89,7 @@ hg2-data-extractor extract <version> <asset-names> --preset items --asset-file a
 ---
 
 ### **5. Download Resources**
-Downloads resource files from a server (e.g., auido.pck, video.mp4).
+Downloads resource files from a server (e.g., audio.pck, video.mp4).
 
 ```bash
 hg2-data-extractor resources <server> <version> --overwrite --output-dir resources
