@@ -1,63 +1,23 @@
 import json
-import re
-from dataclasses import dataclass
 from pathlib import Path
-from typing import TypedDict
 
 import requests
-import UnityPy
 from requests.exceptions import HTTPError
 from tqdm import tqdm
 from UnityPy.classes import TextAsset
 
-from .config import settings
-from .enums import Server
-
-
-class GameObjectJSON(TypedDict):
-    N: str
-    FS: str
-    CRC: str
-    PN: str
-    ULM: str
-    DLM: str
-    BT: str
-    R: str
-    APS: list[str]
-    HS: str | None
-
-
-@dataclass
-class GameObject:
-    N: str
-    FS: str
-    CRC: str
-    PN: str
-    ULM: str
-    DLM: str
-    BT: str
-    R: str
-    APS: list[str]
-    HS: str | None = None
-
-    @property
-    def full_name(self) -> str:
-        if self.HS is not None:
-            return f"{self.N}_{self.HS}_{self.CRC}"
-        return f"{self.N}_{self.CRC}"
-
-    @property
-    def file_name(self) -> str:
-        return str(Path(self.N).name)
+from hg2_data_extractor.bundle_patch import hg2_load
+from hg2_data_extractor.config import settings
+from hg2_data_extractor.enums import Server
+from hg2_data_extractor.types import GameObject, GameObjectJSON, Version
 
 
 class DataDownloader:
     def __init__(self, server: Server, version: str):
         self.server = server
-        self.validate_version(version)
-        self.version = version.replace(".", "_").strip()
-        self.data_url = settings.create_data_url(version, server)
-        self.resources_url = settings.create_resources_url(version, server)
+        self.version = Version(version)
+        self.data_url = settings.create_data_url(self.version.str, server)
+        self.resources_url = settings.create_resources_url(self.version.str, server)
 
     def download_data_all(self, output_dir: Path, *, progressbar: bool = False) -> None:
         output_dir.mkdir(parents=True, exist_ok=True)
@@ -114,9 +74,8 @@ class DataDownloader:
 
         return resources
 
-    @staticmethod
-    def parse_objects_json(unity_file: bytes) -> list[GameObjectJSON]:
-        bundle = UnityPy.load(unity_file)
+    def parse_objects_json(self, unity_file: bytes) -> list[GameObjectJSON]:
+        bundle = hg2_load(unity_file, version=self.version.float)
         for asset_reader in bundle.objects:
             asset = asset_reader.read()
             if isinstance(asset, TextAsset):
@@ -152,16 +111,3 @@ class DataDownloader:
             raise ValueError(msg) from e
 
         return response.content
-
-    @staticmethod
-    def validate_version(version: str) -> None:
-        pattern = r"""
-            ^                   # begin
-            [1-9]\d*            # first part of the version
-            [.|_]               # separator
-            \d+                 # second part of the version
-            $                   # end
-        """
-        if not re.match(pattern, version, re.VERBOSE):
-            msg = f"Invalid version format: {version}. Expected x_y or x.y"
-            raise ValueError(msg)

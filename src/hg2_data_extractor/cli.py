@@ -5,37 +5,39 @@ from typing import Annotated, Any
 
 import typer
 
-from .data_cipher import DataCipher
-from .data_downloader import DataDownloader
-from .data_extractor import DataExtractor
-from .enums import PRESETS, Preset, Server
+from hg2_data_extractor.config import settings
+from hg2_data_extractor.data_cipher import DataCipher
+from hg2_data_extractor.data_downloader import DataDownloader
+from hg2_data_extractor.data_extractor import DataExtractor
+from hg2_data_extractor.enums import PRESET_MAP, Preset, Server
 
 app = typer.Typer()
 
-output_dir_option = typer.Option(
-    "--output-dir",
-    "-o",
-    help="Path to the directory where files will be saved.",
-)
-
-data_all_option = typer.Option(
-    "--data-all",
-    "-d",
-    help="Path to the data_all_dec.unity3d file.",
-)
 OutputDirOption = Annotated[
     Path,
-    output_dir_option,
+    typer.Option(
+        "--output-dir",
+        "-o",
+        help="Path to the directory where files will be saved.",
+        file_okay=False,
+    ),
 ]
 DataAllOption = Annotated[
     Path,
-    data_all_option,
+    typer.Option(
+        "--data-all",
+        "-d",
+        help="Path to the data_all_dec.unity3d file.",
+        dir_okay=False,
+        exists=True,
+    ),
 ]
+
 ServerArgument = Annotated[Server, typer.Argument(case_sensitive=False)]
 VersionArgument = Annotated[str, typer.Argument()]
 
 
-def handle_errors(func: Callable[[Any], Any]) -> Callable[[Any], Any]:
+def handle_errors(func: Callable[..., Any]) -> Callable[..., Any]:
     @functools.wraps(func)
     def wrapper(*args: tuple[Any], **kwargs: dict[Any, Any]) -> Any:
         try:
@@ -50,6 +52,7 @@ def handle_errors(func: Callable[[Any], Any]) -> Callable[[Any], Any]:
 @app.command()  # type: ignore
 @handle_errors
 def lst(
+    version: VersionArgument,
     output_dir: OutputDirOption = Path("extracted"),
     data_all: DataAllOption = Path("data_all/data_all_dec.unity3d"),
 ) -> None:
@@ -57,7 +60,7 @@ def lst(
     Writes names list of all existed assets.
     """
     output = output_dir / "lst.txt"
-    data_extractor = DataExtractor(data_all)
+    data_extractor = DataExtractor(data_all, version)
     data_extractor.list_asset_names(output)
 
 
@@ -125,12 +128,14 @@ def decrypt(
     """
     Decrypts data_all.unity3d.
     """
-    DataCipher.decrypt_file(input, output_dir)
+    data_cipher = DataCipher(settings.AES_KEY, settings.AES_IV)
+    data_cipher.decrypt_file(input, output_dir)
 
 
 @app.command()  # type: ignore
 @handle_errors
 def extract(
+    version: VersionArgument,
     asset_names: Annotated[
         list[str] | None,
         typer.Argument(help="List of asset names that will be extraced."),
@@ -159,7 +164,7 @@ def extract(
     """
 
     if preset:
-        asset_names = PRESETS[preset]
+        asset_names = PRESET_MAP[preset]
     elif asset_file:
         with asset_file.open(encoding="utf-8") as file:
             asset_names = [line.strip() for line in file if line.strip()]
@@ -172,7 +177,7 @@ def extract(
         )
         raise typer.Exit(code=1)
 
-    data_extractor = DataExtractor(data_all)
+    data_extractor = DataExtractor(data_all, version)
     for asset_name in asset_names:
         data_extractor.extract_asset(asset_name, output_dir)
 

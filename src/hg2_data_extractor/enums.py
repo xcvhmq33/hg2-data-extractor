@@ -36,7 +36,7 @@ class StoryData(Enum):
     DLC = "DLCStory"
 
 
-PRESETS: dict[Preset, list[str]] = {
+PRESET_MAP: dict[Preset, list[str]] = {
     Preset.ITEMS: [item.value for item in ItemData],
     Preset.STORY: [story.value for story in StoryData],
 }

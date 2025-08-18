@@ -1,16 +1,21 @@
 from pydantic import HttpUrl
-from pydantic_settings import BaseSettings, SettingsConfigDict
+from pydantic_settings import BaseSettings
 
-from .enums import Server
+from hg2_data_extractor.enums import Server
 
 
 class Settings(BaseSettings):
-    model_config = SettingsConfigDict(env_file="../.env")
     JP_HOST: str = "https://s3-ap-northeast-1.amazonaws.com/"
     CN_HOST: str = "https://assets.hsod2.benghuai.com/"
     JP_ALIAS: str = "jporiginal"
     CN_ALIAS: str = "original"
     DATA_PATH_CORE_TEMPLATE: str = "asset_bundle/{version}/{server}/android/"
+
+    AES_KEY: bytes = bytes.fromhex(
+        "89 83 83 10 3a 0f d9 52 ea 9f 3c 14 50 9c 56 92 "
+        "a4 6e ab bf 46 1a 54 ac b2 7e 82 a7 99 6d 35 b8"
+    )
+    AES_IV: bytes = bytes.fromhex("81 e0 ca d4 a5 df 51 da 37 ba 49 ee cc 8a 4f fe")
 
     def create_core_url(self, version: str, server: Server) -> HttpUrl:
         if server == Server.CN:

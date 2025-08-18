@@ -1,18 +1,17 @@
 from pathlib import Path
 
-import UnityPy
 from UnityPy.classes import TextAsset
 
-from .exceptions import AssetNotFoundError
+from hg2_data_extractor.bundle_patch import hg2_load
+from hg2_data_extractor.exceptions import AssetNotFoundError
+from hg2_data_extractor.types import Version
 
 
 class DataExtractor:
-    def __init__(self, data_all: Path):
-        if not data_all.exists():
-            msg = f"Data_all file not found: {data_all}."
-            raise FileNotFoundError(msg)
+    def __init__(self, data_all: Path, version: str):
         self.data_all = data_all
-        self.data_all_bundle = UnityPy.load(str(data_all))
+        self.version = Version(version)
+        self.data_all_bundle = hg2_load(str(self.data_all), version=self.version.float)
         if not self.data_all_bundle.container:
             msg = f"No assets found in the {self.data_all}."
             raise AssetNotFoundError(msg)
